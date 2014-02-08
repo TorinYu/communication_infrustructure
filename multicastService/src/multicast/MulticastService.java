@@ -9,31 +9,39 @@ import java.util.HashMap;
 import clockPackage.VectorTimeStamp;
 import defaultCommunication.Message;
 
-public class MulticastService {
+public class MulticastService extends MessagePasser{
 	
 	HashMap<String, ArrayList<String>> groupList;
-	HashMap<String, VectorTimeStamp> groupTimeStamp;
+	VectorTimeStamp groupTimeStamp;
 	ArrayList<Message> receivedMessages;
 	
-	public MulticastService() {
+	public MulticastService(String configuration_filename, String local_name) {
+		super(configuration_filename, local_name);
 		HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
-		HashMap<String, VectorTimeStamp> groupTimeStamp = new HashMap<String, VectorTimeStamp>();
+		VectorTimeStamp groupTimeStamp = new VectorTimeStamp(getNodes().size(),getLocal_node().getNode_index());
 		ArrayList<Message> receivedMessages = new ArrayList<Message>();
-
 	}
 	
-	public void bMulticast(String groupName, Message message, MessagePasser mp) {
+	public void bMulticast(String groupName, Message message) {
 		ArrayList<String> sendArrayList = groupList.get(groupName);
+		synchronized (groupTimeStamp) {
+			groupTimeStamp.increaseValue();
+		}
 		for (String a : sendArrayList) {
 			Message newMessage = new Message(message);
+			message.setMulticast(true);
+			((TimeStampedMessage)newMessage).setTimeStamp(groupTimeStamp);
 			newMessage.set_dest(a);
-			mp.send(newMessage);
+			send(newMessage);
 		}
 	}
 	
 	public void bDeliver(String groupName,Message message, MessagePasser mp) {
+		synchronized (groupTimeStamp) {
+			groupTimeStamp.increaseValue();
+		}
 		if (receivedMessages.contains(message)) {
-			
+			return;
 		} else {
 			receivedMessages.add(message);
 			ArrayList<String> sendArrayList = groupList.get(groupName);
@@ -41,14 +49,14 @@ public class MulticastService {
 				if (a.equals(mp.getLocal_node())) {
 					continue;
 				} else {
-					bMulticast(groupName, message, mp);
+					bMulticast(groupName, message);
 				}
 			}
 		}
 	}
 	
 	public void rDeliver(String groupName, ArrayList<Message> receivedMessages, MessagePasser mp) {
-		long[] groupTime = groupTimeStamp.get(groupName).getTimeStamps();
+		long[] groupTime = groupTimeStamp.getTimeStamps();
 		Message message = receivedMessages.get(0);
 		long[] messageTime = ((VectorTimeStamp)((TimeStampedMessage)message).getTimeStamp()).getTimeStamps();
 		int length = groupTime.length;

@@ -25,6 +25,7 @@ public class Message implements Serializable{
     private Boolean logger = false;
     
     private EventType eventType = null; 
+    boolean multicast = false;
     
     public Message(String dest, String kind, Object data) {
     	this.dest = dest;
@@ -106,6 +107,14 @@ public class Message implements Serializable{
     public EventType get_eventType() {
     	return eventType;
     }
+    
+    public boolean isMulticast() {
+		return multicast;
+	}
+
+	public void setMulticast(boolean multicast) {
+		this.multicast = multicast;
+	}
 
 	@Override
 	public String toString() {
@@ -114,4 +123,6 @@ public class Message implements Serializable{
 				+ duplicate + ", eventType=" + eventType
 				+ "]";
 	}
+
+	
 }

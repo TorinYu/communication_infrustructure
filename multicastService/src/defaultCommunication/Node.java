@@ -16,4 +16,12 @@ public class Node {
         this.node_port = port;
         this.node_index = index;
     }
+
+	public int getNode_index() {
+		return node_index;
+	}
+
+	public void setNode_index(int node_index) {
+		this.node_index = node_index;
+	}  
 }

@@ -108,12 +108,15 @@ public class MessagePasser {
 		message.set_seqNum(curMsgSeq++);
 		Action action = null;
 		
-		synchronized (clockLock) {
-			if (message instanceof TimeStampedMessage && clockService != null ) {
-				clockService.increaseTimeStamp();
-				((TimeStampedMessage) message).setTimeStamp(clockService.copyOfTimeStamp());
+		if (message.isMulticast() == false) {
+			synchronized (clockLock) {
+				if (message instanceof TimeStampedMessage && clockService != null ) {
+					clockService.increaseTimeStamp();
+					((TimeStampedMessage) message).setTimeStamp(clockService.copyOfTimeStamp());
+				}
 			}
-		}
+		} 
+		
 		
 		synchronized (ruleLock) {
 			try {
@@ -419,6 +422,13 @@ public class MessagePasser {
 	public void setIncomingBuffer(BlockingQueue<Message> incomingBuffer) {
 		this.incomingBuffer = incomingBuffer;
 	}
+	public HashMap<String, Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(HashMap<String, Node> nodes) {
+		this.nodes = nodes;
+	}
 
 	/* create an event other than message */
 	public void createEvent() {
@@ -429,6 +439,8 @@ public class MessagePasser {
 			}
 		}
 	}
+
+
 
 
 }
