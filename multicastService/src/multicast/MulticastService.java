@@ -17,9 +17,9 @@ public class MulticastService extends MessagePasser{
 	
 	public MulticastService(String configuration_filename, String local_name) {
 		super(configuration_filename, local_name);
-		HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
-		VectorTimeStamp groupTimeStamp = new VectorTimeStamp(getNodes().size(),getLocal_node().getNode_index());
-		ArrayList<Message> receivedMessages = new ArrayList<Message>();
+		groupList = new HashMap<String, ArrayList<String>>();
+		groupTimeStamp = new VectorTimeStamp(getNodes().size(),getLocal_node().getNode_index());
+		receivedMessages = new ArrayList<Message>();
 	}
 	
 	public void bMulticast(String groupName, Message message) {

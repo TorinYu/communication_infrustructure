@@ -40,6 +40,7 @@ public class MessagePasser {
 	
     private List<Rule> sendRules = new ArrayList<Rule>();
 	private List<Rule> receiveRules = new ArrayList<Rule>();
+	private HashMap<String, ArrayList<String>> groups = new HashMap<String, ArrayList<String>>();
 	// Lock used by rules
     private byte[] ruleLock = new byte[0];
     // Lock for receive buffer
@@ -310,6 +311,7 @@ public class MessagePasser {
 		List rules1 = (List) map.get("sendRules");
 		List rules2 = (List) map.get("receiveRules");
 		String clock = (String) map.get("clockType");
+		ArrayList<Map<String, Object>> groupsList = (ArrayList<Map<String, Object>>) map.get("Groups");
 	
 		input.close();
 		
@@ -352,6 +354,18 @@ public class MessagePasser {
 					(String)tmpMap.get("kind"), (Integer)tmpMap.get("seqNum"), (Boolean)tmpMap.get("duplicate"));
 			receiveRules.add(rule);
 		}
+		
+		groups.clear();
+		for (Map<String, Object> yamlGroup : groupsList) {
+    		try {
+                String name = yamlGroup.get("Name").toString();
+                ArrayList<String> members = (ArrayList<String>) yamlGroup.get("Members");
+                groups.put(name, members);
+            } catch (Exception e) {
+                System.err.println("ERROR: configuration file error - " + yamlGroup);
+                e.printStackTrace();
+            }
+    	}
 	}
 
 	public Action compareMsgWithRules(Message msg, List<Rule> rules) {
