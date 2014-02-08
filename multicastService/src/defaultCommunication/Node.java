@@ -23,5 +23,13 @@ public class Node {
 
 	public void setNode_index(int node_index) {
 		this.node_index = node_index;
+	}
+
+	public String getNode_name() {
+		return node_name;
+	}
+
+	public void setNode_name(String node_name) {
+		this.node_name = node_name;
 	}  
-}
+} 

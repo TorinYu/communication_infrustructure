@@ -25,7 +25,8 @@ public class Message implements Serializable{
     private Boolean logger = false;
     
     private EventType eventType = null; 
-    boolean multicast = false;
+    private boolean multicast = false;
+    private String groupName;  
     
     public Message(String dest, String kind, Object data) {
     	this.dest = dest;
@@ -122,6 +123,14 @@ public class Message implements Serializable{
 				+ ", seqNum=" + seqNum + ", source=" + source + ", duplicate="
 				+ duplicate + ", eventType=" + eventType
 				+ "]";
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 
 	

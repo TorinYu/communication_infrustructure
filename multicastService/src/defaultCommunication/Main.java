@@ -4,6 +4,7 @@ package defaultCommunication;
  * 
  * Main function for application running on node
  */
+import multicast.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,8 +32,10 @@ public class Main {
 		BufferedReader br = null;
 		HashSet<String> nodeNames = null;
 		try {
-			//messagePasser = MessagePasser.createMessagePasser(args[0], args[1]);
-			messagePasser = MessagePasser.createMessagePasser("resource/Lab0.yaml", "alice");
+			
+			MulticastService muticastPasser = new MulticastService(args[0], args[1]);
+			messagePasser = MessagePasser.createMessagePasser(args[0], args[1]);
+			//messagePasser = MessagePasser.createMessagePasser("resource/Lab0.yaml", "alice");
 			nodeNames = messagePasser.getNames();
 			
 			br = new BufferedReader (new InputStreamReader(System.in));

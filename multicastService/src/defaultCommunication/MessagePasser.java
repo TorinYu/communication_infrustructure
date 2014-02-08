@@ -365,7 +365,7 @@ public class MessagePasser {
                 System.err.println("ERROR: configuration file error - " + yamlGroup);
                 e.printStackTrace();
             }
-    	}
+    	} 
 	}
 
 	public Action compareMsgWithRules(Message msg, List<Rule> rules) {
@@ -452,6 +452,14 @@ public class MessagePasser {
 				System.out.println(clockService.getTimeStamp().toString());
 			}
 		}
+	}
+
+	public HashMap<String, ArrayList<String>> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(HashMap<String, ArrayList<String>> groups) {
+		this.groups = groups;
 	}
 
 

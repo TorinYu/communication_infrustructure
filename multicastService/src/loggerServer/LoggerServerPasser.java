@@ -33,7 +33,6 @@ public class LoggerServerPasser extends MessagePasser{
 		synchronized (receiveLock) {
 			incomingBuffer.add(message);
 		}
-		
 	}
 	
 	public void print(ArrayList<Message> timestampMessagesList, ClockType clockType) {
