@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.yaml.snakeyaml.Yaml;
 
+import sun.security.jca.GetInstance;
 import clockPackage.TimeStampedMessage;
 import clockService.ClockFactory;
 import clockService.ClockService;
@@ -40,7 +41,7 @@ public class MessagePasser {
 	
     private List<Rule> sendRules = new ArrayList<Rule>();
 	private List<Rule> receiveRules = new ArrayList<Rule>();
-	private HashMap<String, ArrayList<String>> groups = new HashMap<String, ArrayList<String>>();
+	public HashMap<String, ArrayList<String>> groups = new HashMap<String, ArrayList<String>>();
 	// Lock used by rules
     private byte[] ruleLock = new byte[0];
     // Lock for receive buffer
@@ -52,7 +53,7 @@ public class MessagePasser {
 	protected BlockingQueue<Message> incomingBuffer = new LinkedBlockingQueue<Message>();
 	protected BlockingQueue<Message> incomingDelayBuffer = new LinkedBlockingQueue<Message>(); 
 	
-	protected static MessagePasser messagePasser = null;
+	public static MessagePasser messagePasser = null;
 	private Node local_node = null;
 	private static int curMsgSeq = 1;
 	private String configuration_filename;
@@ -62,6 +63,7 @@ public class MessagePasser {
 	private ClockType clockType = null;
 	private Node loggerNode = null;
 	
+	
  	public static MessagePasser createMessagePasser(String configuration_filename, String local_name) throws Exception {
 		if (messagePasser == null) {
 			messagePasser = new MessagePasser(configuration_filename, local_name);
@@ -69,6 +71,10 @@ public class MessagePasser {
 		else {
 			throw new Exception("MessagePasser can only be created for once.");
 		}
+		return messagePasser;
+	}
+ 	
+ 	public static MessagePasser getInstance() {
 		return messagePasser;
 	}
 	

@@ -19,8 +19,12 @@ public class Main {
 			"    Receive a Message: receive\n" +
 			"    Create an Event: event\n" +
 			"    Info: help \n" +
-			"    Exit: exit\n";
+			"    Exit: exit\n" + 
+			"    Multicast: "
+			
+			;
 	public static MessagePasser messagePasser = null;
+	public static MulticastService multicastPasser = null;
 	
 	public static void main(String[] args) {		
 		
@@ -33,10 +37,12 @@ public class Main {
 		HashSet<String> nodeNames = null;
 		try {
 			
-			MulticastService muticastPasser = new MulticastService(args[0], args[1]);
 			messagePasser = MessagePasser.createMessagePasser(args[0], args[1]);
+			multicastPasser = new MulticastService();
+			
 			//messagePasser = MessagePasser.createMessagePasser("resource/Lab0.yaml", "alice");
-			nodeNames = messagePasser.getNames();
+			//nodeNames = messagePasser.getNames();
+			nodeNames = MessagePasser.getInstance().getNames();
 			
 			br = new BufferedReader (new InputStreamReader(System.in));
 			System.out.println(usage);
@@ -63,11 +69,17 @@ public class Main {
 					}
 				}
 				else {
+					if (sArray[0].equals("multicast") && sArray[1].equals("-d") 
+							|| sArray[3].equals("-k") && sArray[5].equals("-m") && !sArray[7].equals("-l")) {
+					   TimeStampedMessage message = new TimeStampedMessage(sArray[2], sArray[4], sArray[6]);
+					   multicastPasser.bMulticast(sArray[2], message);
+					
+					} else
 					if (!sArray[0].equals("send") || !sArray[1].equals("-d") 
 							|| !sArray[3].equals("-k") || !sArray[5].equals("-m") || !sArray[7].equals("-l")) {
 						System.out.println(usage);
-					}
-					else if (!nodeNames.contains(sArray[2])) {
+					} else 
+					 if (!nodeNames.contains(sArray[2])) {
 						System.out.println("Destination Name Invalid.");
 					}
 					else {
@@ -96,6 +108,7 @@ public class Main {
 	private static void createEvent() {
 		messagePasser.createEvent();
 	}
+	
 	
 	/* receive message */
 	private static void receive() {

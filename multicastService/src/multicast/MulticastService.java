@@ -10,39 +10,40 @@ import java.util.Set;
 import clockPackage.VectorTimeStamp;
 import defaultCommunication.Message;
 
-public class MulticastService extends MessagePasser{
+public class MulticastService{
 	
-	HashMap<String, ArrayList<String>> groupList;
+	//HashMap<String, ArrayList<String>> groupList;
 	HashMap<String, VectorTimeStamp> groupTimeStamp;
 	ArrayList<Message> receivedMessages;
 	ArrayList<Message> holdbackQueue;
 	
-	public MulticastService(String configuration_filename, String local_name) {
-		super(configuration_filename, local_name);
+	public MulticastService() {
+		//super(configuration_filename, local_name);
 		groupTimeStamp = new HashMap<String, VectorTimeStamp>();
 		receivedMessages = new ArrayList<Message>();
 		holdbackQueue = new ArrayList<Message>();
         //int groupNum = getGroups().size();
-        Set<String> nodeSet = getNodes().keySet();
+        Set<String> nodeSet = MessagePasser.getInstance().groups.keySet();
         for (String a : nodeSet) {
-        	groupTimeStamp.put(a, new VectorTimeStamp(getNodes().size(),getLocal_node().getNode_index()));
+        	groupTimeStamp.put(a, new VectorTimeStamp(MessagePasser.getInstance().getNodes().size(),MessagePasser.getInstance().getLocal_node().getNode_index()));
         }     
 	}
 	
 	public void bMulticast(String groupName, Message message) {
-		ArrayList<String> sendArrayList = groupList.get(groupName);
+		ArrayList<String> sendArrayList = MessagePasser.getInstance().groups.get(groupName);
 		VectorTimeStamp currentTimeStamp = groupTimeStamp.get(groupName);
 		synchronized (currentTimeStamp) {
 			//TODO
 			currentTimeStamp.increaseValue();
 		}
 		for (String a : sendArrayList) {
-			Message newMessage = new Message(message);
+			Message newMessage = new TimeStampedMessage(message);
 			message.setMulticast(true);
 			((TimeStampedMessage)newMessage).setTimeStamp(currentTimeStamp);
 			newMessage.set_dest(a);
 			newMessage.setGroupName(groupName);
-			send(newMessage);
+			newMessage.setMulticast(true);
+			MessagePasser.getInstance().send(newMessage);
 		}
 	}
 	
@@ -53,7 +54,7 @@ public class MulticastService extends MessagePasser{
 		} else {
 			receivedMessages.add(message);
 			holdbackQueue.add(message);
-			if (message.get_source() != getLocal_node().getNode_name()) {
+			if (message.get_source() != MessagePasser.getInstance().getLocal_node().getNode_name()) {
 				bMulticast(groupName, message);
 			}
 		}
@@ -73,7 +74,7 @@ public class MulticastService extends MessagePasser{
 				long[] messageTime = ((VectorTimeStamp)((TimeStampedMessage)message).getTimeStamp()).getTimeStamps();
 				int length = groupTime.length;
 				String src = message.get_source();
-				int index = getNodes().get(src).getNode_index();
+				int index = MessagePasser.getInstance().getNodes().get(src).getNode_index();
 				int flag = 0;
 				if (messageTime[index] - groupTime[index] == 1) {
 					for (int j = 0; j < length; j++) {
@@ -91,7 +92,7 @@ public class MulticastService extends MessagePasser{
 							currentTimeStamp.increaseValue();
 							sendFlag++;
 						}
-				        getIncomingBuffer().add(message);
+						MessagePasser.getInstance().getIncomingBuffer().add(message);
 				        holdbackQueue.remove(i);
 					} 
 

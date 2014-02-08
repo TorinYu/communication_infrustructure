@@ -1,5 +1,6 @@
 package defaultCommunication;
 
+import multicast.*;
 /*
  * Author: Tao yu, Minglei Chen 
  * 
@@ -9,6 +10,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+
+import multicast.MulticastService;
 
 
 public class ServerThread implements Runnable{
@@ -32,6 +35,9 @@ public class ServerThread implements Runnable{
 				message = (Message)ois.readObject();
 				//System.out.println("ServerThread: " + message.get_dest());
 				//System.out.println("ServerThread: " + message.get_data());
+				if (message.isMulticast()) {
+					Main.multicastPasser.bDeliver(message.getGroupName(), message);
+				}
 				messagePasser.receiveMsg(message);
 				ois = new ObjectInputStream(socket.getInputStream());
 			}

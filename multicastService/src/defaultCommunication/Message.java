@@ -119,9 +119,9 @@ public class Message implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Message [dest=" + dest + ", kind=" + kind + ", data=" + data
+		return "Message [dest=" + dest + ", kind=" + kind + ", Group= "+ groupName + ", data=" + data
 				+ ", seqNum=" + seqNum + ", source=" + source + ", duplicate="
-				+ duplicate + ", eventType=" + eventType
+				+ duplicate + ", eventType=" + eventType + ", multicast=" + multicast  
 				+ "]";
 	}
 
