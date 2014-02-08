@@ -31,8 +31,8 @@ public class Main {
 		BufferedReader br = null;
 		HashSet<String> nodeNames = null;
 		try {
-			messagePasser = MessagePasser.createMessagePasser(args[0], args[1]);
-			//messagePasser = MessagePasser.createMessagePasser("resource/configuration_test.yaml", "minglei_nodea");
+			//messagePasser = MessagePasser.createMessagePasser(args[0], args[1]);
+			messagePasser = MessagePasser.createMessagePasser("resource/Lab0.yaml", "alice");
 			nodeNames = messagePasser.getNames();
 			
 			br = new BufferedReader (new InputStreamReader(System.in));
