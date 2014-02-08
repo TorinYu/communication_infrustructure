@@ -17,9 +17,14 @@ public class MulticastService extends MessagePasser{
 	
 	public MulticastService(String configuration_filename, String local_name) {
 		super(configuration_filename, local_name);
-		HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
+		//HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
 		VectorTimeStamp groupTimeStamp = new VectorTimeStamp(getNodes().size(),getLocal_node().getNode_index());
 		ArrayList<Message> receivedMessages = new ArrayList<Message>();
+	}
+	
+	public void rMulticast(String groupName, Message message) {
+		bMulticast(groupName, message);
+		bDeliver(groupName, message); 
 	}
 	
 	public void bMulticast(String groupName, Message message) {
@@ -36,17 +41,15 @@ public class MulticastService extends MessagePasser{
 		}
 	}
 	
-	public void bDeliver(String groupName,Message message, MessagePasser mp) {
-		synchronized (groupTimeStamp) {
-			groupTimeStamp.increaseValue();
-		}
+	public void bDeliver(String groupName,Message message) {
+		
 		if (receivedMessages.contains(message)) {
 			return;
 		} else {
 			receivedMessages.add(message);
 			ArrayList<String> sendArrayList = groupList.get(groupName);
 			for (String a : sendArrayList) {
-				if (a.equals(mp.getLocal_node())) {
+				if (a.equals(getLocal_node())) {
 					continue;
 				} else {
 					bMulticast(groupName, message);
@@ -55,34 +58,42 @@ public class MulticastService extends MessagePasser{
 		}
 	}
 	
-	public void rDeliver(String groupName, ArrayList<Message> receivedMessages, MessagePasser mp) {
+	public void rDeliver(String groupName, ArrayList<Message> receivedMessages) {
 		long[] groupTime = groupTimeStamp.getTimeStamps();
 		Message message = receivedMessages.get(0);
 		long[] messageTime = ((VectorTimeStamp)((TimeStampedMessage)message).getTimeStamp()).getTimeStamps();
 		int length = groupTime.length;
 		String src = message.get_source();
-		int index = 0;
+		int index = getNodes().get(src).getNode_index();
 		int flag = 0;
-		for (int i = 0; i < length; i++) {
-			if (i != index) {
-				if (groupTime[i] < messageTime[i]) {
-					flag = 1;
-					break;
-				} 
-			} else {
-				if (groupTime[i] + 1 != messageTime[i] ) {
-					flag = 1;
-					break;
-				} 
+
+		if (messageTime[index] - groupTime[index] == 1) {
+			for (int i = 0; i < length; i++) {
+				if (i == index) {
+					continue;
+				} else {
+					if (messageTime[i] < groupTime[i]) {
+						flag = 1;
+						break;
+					}
+				}
 			}
-		}
-		if (flag == 0) {
-			mp.getIncomingBuffer().add(message);
-			receivedMessages.remove(0);
+			if (flag == 0) {
+				synchronized (groupTimeStamp) {
+					groupTimeStamp.increaseValue();
+				}
+		        getIncomingBuffer().add(message);
+		        receivedMessages.remove(0);
+			} else {
+				Message tempMessage = receivedMessages.remove(0);
+				receivedMessages.add(tempMessage);
+				rDeliver(groupName, receivedMessages);
+			}
 		} else {
-			// TODO
-			rDeliver(groupName, receivedMessages, mp);
-		}
+			Message tempMessage = receivedMessages.remove(0);
+			receivedMessages.add(tempMessage);
+			rDeliver(groupName, receivedMessages);
+		}	
 	}
 		
 }
