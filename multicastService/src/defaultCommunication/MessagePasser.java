@@ -312,7 +312,6 @@ public class MessagePasser {
 		List rules2 = (List) map.get("receiveRules");
 		String clock = (String) map.get("clockType");
 		ArrayList<Map<String, Object>> groupsList = (ArrayList<Map<String, Object>>) map.get("Groups");
-	
 		input.close();
 		
 		if (initial) {
